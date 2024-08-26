@@ -1,0 +1,204 @@
+----- Part A -----
+// returns the median of a tree
+function findMedian(tree)
+    length <- countNodes(tree)
+    m_index <- (length + 1)/2
+    int median
+
+    nth_element(tree, m_index, &median)
+
+    return median
+
+// counts total number of nodes in the tree
+function countNodes(tree)
+    if tree == NULL then
+        return 0
+    
+    return tree.numVals + countNodes(tree.child0) + countNodes(tree.child1) +
+            countNodes(tree.child2) + countNodes(tree.child3)
+
+
+// finds the n'th element in the tree, stores this element in element pointer
+function nth_element(tree, n, int *element) 
+    static int count <- 0
+
+    if tree == NULL then
+        return
+
+    if count <= n then
+        // in order traversal of the tree, incrementing count when values are seen
+
+        nth_element(tree.child0, n, element)
+
+        if tree.value1 != (-1) then 
+            count <- count + 1
+        
+        if count == n then
+            *element <-  tree.value1
+            return
+        
+        nth_element(tree.child1, n, element)
+
+        if tree.value2 != (-1) then
+            count <- count + 1
+        
+        if count == n then
+            *element <-  tree.value2
+            return
+        
+        nth_element(tree.child2, n, element)
+
+        if tree.value3 != (-1) then
+            count <- count + 1
+        
+        if count == n then
+            *element <-  tree.value3
+            return
+        
+        nth_element(tree.child3, n, element)
+    
+
+
+
+----- Part B -----
+
+// recursively updates numDescendants in all nodes by updating children first
+function updateDescendants(tree)
+    // base case : leaf node does not need updating
+    if tree.child0 == NULL then
+        return
+
+    // update numDescendants of child0 and then add its contribution to the tree
+    updateDescendants(tree.child0)
+    tree.numDescendants <- (tree.child0).numDescendants + (tree.child0).numVals
+
+    // update numDescendants of child1 and then add its contribution to the tree
+    updateDescendants(tree.child1)
+    tree.numDescendants += (tree.child1).numDescendants + (tree.child1).numVals
+
+    // update numDescendants of child2 and then add its contribution to the tree
+    if tree.child2 != NULL then
+        updateDescendants(tree.child2)
+        tree.numDescendants += (tree.child2).numDescendants + (tree.child2).numVals
+    
+    // update numDescendants of child3 and then add its contribution to the tree
+    if tree.child3 != NULL then
+        updateDescendants(tree.child3)
+        tree.numDescendants += (tree.child3).numDescendants + (tree.child3).numVals
+    
+
+
+
+----- Part C -----
+
+// finds and prints median of the tree
+function findMedian(tree)
+    numNodes <- tree.numVals + tree.numDescendants
+    index <- (numNodes + 1)/2
+    recursiveFindMedian(tree, 1, index, 0)
+
+
+
+/* Recursively finds, and then prints the number in the tree 
+   with specified index, and its level
+   low : represents the lowest index that can be found in the current tree
+   index: represents the index to be found (in sorted order)
+   level: level of the tree, starting from 0 at the root
+*/
+function recursiveFindMedian(tree, low, index, level)
+    if tree == NULL then
+        return    
+
+    // median is found in leaf node
+    if tree.child0 == NULL then
+        if low == index then
+            median <- tree.value1
+            print(median, level)
+        
+        else if low + 1 == index then
+            median <- tree.value2
+            print(median, level)
+
+        else if low + 2 == index then 
+            median <- tree.value3
+            print(median, level)
+        
+        return
+
+    /* checking child0 ...
+       high : currently represents the index of value1 
+    */
+    high <- low + (tree.child0).numDescendants + (tree.child0).numVals
+
+    // median index is found in child0 of current tree
+    if index < high then
+        recursiveFindMedian(tree.child0, low, index, level + 1)
+        return
+    
+
+    // index of value1 is index of median, so value1 is the median
+    if high == index then
+        median <- tree.value1
+        print(median, level)
+        return
+    
+    /* now checking child1 ...
+       update low and high bounds for possible indexes in child1 
+    */
+    low <- high + 1
+    high <- low + (tree.child1).numDescendants + (tree.child1).numVals 
+
+    // median index is found in child1
+    if index < high then
+        recursiveFindMedian(tree.child1, low, index, level + 1)
+        return
+    
+
+    // index of value2 is index of median, so value2 is the median
+    if high == index
+        median <- tree.value2
+        print(median, level) 
+        return
+    
+
+    /* now checking child2 ...
+       update low and high bounds for possible indexes in child2 
+    */
+    low <- high + 1
+    high <- low + (tree.child2).numDescendants + (tree.child2).numVals
+
+    // median is found in child2
+    if index < high then
+        recursiveFindMedian(tree.child2, low, index, level + 1)
+        return
+    
+
+    // index of value 3 is index of median, so value3 is the median
+    if high == index then
+        median <- tree.value3
+        print(median, level)
+        return
+    
+
+    /* median is found in child3 if all else fails
+       lowest possible index becomes 1 above the index of value3
+    */
+    low <- high + 1
+    recursiveFindMedian(tree.child3, low, index, level + 1)
+
+
+
+
+----- Part D -----
+
+Since we keep track of number of descendants at each node, this allows us to
+decide exactly which child node to go to in order to find the median, as shown
+in the algorithm.
+
+Hence, the compexity is given by the height of the 2-3-4 tree, which is O(log N) (explained below)
+where N is the number of elements(values) in the 2-3-4 tree.
+
+For height, 2-3-4 tree is always balanced.
+The worst case is when all nodes are 2-nodes, giving height = O(log N) (base 2)
+The best case for height is when there is as many 4-nodes as possible, giving height = O(log N) (base 4), 
+giving O(log N) overall

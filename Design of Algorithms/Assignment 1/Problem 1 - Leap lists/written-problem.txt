@@ -1,0 +1,57 @@
+Write your response to the written problem here
+--
+*** Q1 ***
+on Average, 
+level 1 will have n elements
+level 2 will have n/2 elements
+level 3 will have n/(2^2) elements
+level i will have n/(2^(i-1)) elements
+
+assuming the leap list can have infinite levels, summing elements we get
+n + n/2 + n/(2^2) + n/(2^3) + ... = 2n elements, which is Big-Theta(n) space efficiency on average
+
+
+
+*** Q2 ***
+on average and assuming n = 2^m for some integer m,
+
+at level i = 1 + log(n) (base 2), level i will have n/(2^log(n)) = 1 elements,
+at this level, the 1 element can cause extra levels with probabilities :
+
+1 extra level : p = 0.5^2 (element gets inserted another level, but fails to insert another level on the new level)
+2 extra levels : p = 0.5^3 (element gets inserted on 2 levels, but fails to insert the third level)
+3 extra levels : p = 0.5^4 (element gets inserted on 3 levels, but fails to inserted on the fourth level)
+etc.
+
+so average extra levels from level i = 1 * 0.5^2 + 2 * 0.5^3 + 3 * 0.5^4 + ... = 1 extra level
+
+so hence total number of lists in a leap list on average is 1 + 1 + log(n) = 2 + log(n) 
+
+
+
+*** Q3 ***
+in an average case arrangement of elements on levels in the leap list, we can assume progressing down each
+level in the leap list approximately halves the search radius when projecting down onto the base list.
+
+At on average one pointer access per level in the leap list, and since theres an average of 2 + log(n) lists,
+average time search efficiency for a key is Big-Theta(log(n))
+
+
+
+*** Q4 ***
+one worst-case diagram would for example look like: (+ representing a node)
+
++
++
++
++
++ + + + + + + + + + + +
+
+the height doesn't contribute to the worst-case efficiency, as drop downs don't require a new pointer access
+when comparing the same value.
+
+instead, the worst-case element here would be the bottom right element, which corresponds to Big-Theta(n)
+efficiency
+
+
+
